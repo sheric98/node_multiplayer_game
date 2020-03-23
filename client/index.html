@@ -3,6 +3,7 @@
     <head>
         <title>CORONAVIRUS GAMES</title>
         <script src="../../socket.io/socket.io.js"></script>
+        <script src="js/draw.js"></script>
     </head>
     <body>
         <canvas id="ctx" width="500" height="500" style="border: 1px solid black; float: left"></canvas>
@@ -14,21 +15,10 @@
         var cvs = document.getElementById('ctx');
         var ctx = cvs.getContext('2d');
 
-        var bullets = new Object();
-        var bulletCounter = 0;
-
         var alive = true;
 
         function clearCtx() {
             ctx.clearRect(0, 0, cvs.width, cvs.height);
-        }
-
-        function drawObj(obj, color) {
-            ctx.beginPath();
-            ctx.arc(obj.x, obj.y, obj.radius, 0, 2 * Math.PI, false);
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = color;
-            ctx.stroke();
         }
 
         function getCursorPosition(canvas, event) {
@@ -90,8 +80,9 @@
                 }
                 else {
                     color = 'red';
+                    drawHP(ctx, player);
                 }
-                drawObj(player, color);
+                drawObj(ctx, player, color);
             }
             for (let id in bullets) {
                 var color;
@@ -101,7 +92,7 @@
                 else {
                     color = 'black';
                 }
-                drawObj(bullets[id][0], color);
+                drawObj(ctx, bullets[id][0], color);
             }
         });
 
