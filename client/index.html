@@ -69,31 +69,26 @@
             }
         });
 
-        socket.on('update', function(players, bullets) {
+        socket.on('update', function(players) {
             clearCtx();
             for (let id in players) {
-                var color;
+                var color, bColor;
                 var player = players[id];
                 if (id === socket.id) {
                     color = 'blue';
+                    bColor = 'blue';
                     var hp = document.getElementById('hp');
                     hp.innerHTML = ('HP: ' + player.hp.toString());
                 }
                 else {
                     color = 'red';
+                    bColor = 'black';
                     drawHP(ctx, player);
                 }
                 drawObj(ctx, player, color);
-            }
-            for (let id in bullets) {
-                var color;
-                if (bullets[id][1] === socket.id) {
-                    color = 'blue';
+                for (let bID in player.bullets) {
+                    drawObj(ctx, player.bullets[bID], bColor);
                 }
-                else {
-                    color = 'black';
-                }
-                drawObj(ctx, bullets[id][0], color);
             }
         });
 

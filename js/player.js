@@ -41,6 +41,7 @@ function Player(startX, startY) {
     this.speedX = 0;
     this.speedY = 0;
     this.radius = RADIUS;
+    this.bullets = new Object();
     this.keys = [false, false, false, false];
     this.updateSpeed = function() {
         if (this.keys[0] || this.keys[1]) {

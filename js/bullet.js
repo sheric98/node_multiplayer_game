@@ -42,8 +42,8 @@ function Bullet(player, dst, counter) {
 function updateBullets(bullets) {
     var toRemove = [];
     for (let id in bullets) {
-        bullets[id][0].updatePos();
-        if (offScreen(bullets[id][0], 0, 0, 500, 500)) {
+        bullets[id].updatePos();
+        if (offScreen(bullets[id], 0, 0, 500, 500)) {
             toRemove.push(id);
         }
     }
