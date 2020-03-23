@@ -28,18 +28,24 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('keydown', function(index) {
-        players[socket.id].keydown(index);
+        if (socket.id in players) {
+            players[socket.id].keydown(index);
+        }
     });
 
     socket.on('keyup', function(index) {
-        players[socket.id].keyup(index);
+        if (socket.id in players) {
+            players[socket.id].keyup(index);
+        }
     });
 
     socket.on('shoot', function(dst) {
-        var player = players[socket.id];
-        var bullet = bulletJS.makeBullet(player, dst, bulletCounter);
-        bulletCounter++;
-        bullets[bullet.id] = [bullet, socket.id];
+        if (socket.id in players) {
+            var player = players[socket.id];
+            var bullet = bulletJS.makeBullet(player, dst, bulletCounter);
+            bulletCounter++;
+            bullets[bullet.id] = [bullet, socket.id];
+        }
     });
 });
 
