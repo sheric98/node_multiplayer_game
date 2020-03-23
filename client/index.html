@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CORONAVIRUS GAMES</title>
+        <script src="../../socket.io/socket.io.js"></script>
+    </head>
+    <body>
+        <canvas id="ctx" width="500" height="500" style="border: 1px solid black; float: left"></canvas>
+        <div style="font:Comic Sans MS; font-size: 30px"><b id='hp'></b></div>
+    </body>
+    <script>
+        var socket = io.connect('http://localhost:8899');
+
+        var cvs = document.getElementById('ctx');
+        var ctx = cvs.getContext('2d');
+
+        var bullets = new Object();
+        var bulletCounter = 0;
+
+        var alive = true;
+
+        function clearCtx() {
+            ctx.clearRect(0, 0, cvs.width, cvs.height);
+        }
+
+        function drawObj(obj, color) {
+            ctx.beginPath();
+            ctx.arc(obj.x, obj.y, obj.radius, 0, 2 * Math.PI, false);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = color;
+            ctx.stroke();
+        }
+
+        function getCursorPosition(canvas, event) {
+            const rect = canvas.getBoundingClientRect()
+            const retX = event.clientX - rect.left
+            const retY = event.clientY - rect.top
+            return {x: retX, y: retY};
+        }
+
+        function eventToIndex(eventNum) {
+            switch(eventNum) {
+                case 65:
+                    return 0;
+                    break;
+                case 68:
+                    return 1;
+                    break;
+                case 87:
+                    return 2;
+                    break;
+                case 83:
+                    return 3;
+                    break;
+                default:
+                    return -1;
+                    break;
+            }
+        }
+
+        window.addEventListener('keydown', function(e) {
+            var index = eventToIndex(e.keyCode);
+            if (alive && index != -1) {
+                socket.emit('keydown', index);
+            }
+        });
+
+        window.addEventListener('keyup', function(e) {
+            var index = eventToIndex(e.keyCode);
+            if (alive && index != -1) {
+                socket.emit('keyup', index);
+            }
+        });
+
+        cvs.addEventListener('click', function(e) {
+            if (alive) {
+                socket.emit('shoot', getCursorPosition(cvs, e));
+            }
+        });
+
+        socket.on('update', function(players, bullets) {
+            clearCtx();
+            for (let id in players) {
+                var color;
+                var player = players[id];
+                if (id === socket.id) {
+                    color = 'blue';
+                    var hp = document.getElementById('hp');
+                    hp.innerHTML = ('HP: ' + player.hp.toString());
+                }
+                else {
+                    color = 'red';
+                }
+                drawObj(player, color);
+            }
+            for (let id in bullets) {
+                var color;
+                if (bullets[id][1] === socket.id) {
+                    color = 'blue';
+                }
+                else {
+                    color = 'black';
+                }
+                drawObj(bullets[id][0], color);
+            }
+        });
+
+        socket.on('dead', function() {
+            alert('You are dead.');
+            alive = false;
+        });
+
+        function update() {
+            clearCtx();
+            me.updatePos();
+            me.draw();
+            updateBullets(bullets);
+        }
+
+    </script>
+</html>
