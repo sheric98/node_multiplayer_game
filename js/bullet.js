@@ -26,16 +26,16 @@ function offScreen(bullet, minX, minY, maxX, maxY) {
 function Bullet(player, dst, counter) {
     this.id = 'bullet' + counter.toString();
     var vect = makeUnitVector(player, dst);
-    this.x = player.x;
-    this.y = player.y;
+    this.x = (player.radius * vect[0]) + player.x;
+    this.y = (player.radius * vect[1]) + player.y;
     this.speedX = vect[0];
     this.speedY = vect[1];
     this.speed = 10;
     this.radius = 5;
     this.damage = 5;
     this.updatePos = function() {
-        this.x += Math.round(this.speed * this.speedX);
-        this.y += Math.round(this.speed * this.speedY);
+        this.x += this.speed * this.speedX;
+        this.y += this.speed * this.speedY;
     }
 }
 

@@ -49,7 +49,7 @@ io.sockets.on('connection', function(socket) {
     });
 });
 
-setInterval(sendUpdate, 10);
+setInterval(sendUpdate, 1000 / 60);
 
 function sendUpdate() {
     updatePlayers();

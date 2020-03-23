@@ -2,12 +2,13 @@
 <html>
     <head>
         <title>CORONAVIRUS GAMES</title>
+        <link rel="stylesheet" type="text/css" href="static/index.css">
         <script src="../../socket.io/socket.io.js"></script>
         <script src="js/draw.js"></script>
     </head>
     <body>
-        <canvas id="ctx" width="500" height="500" style="border: 1px solid black; float: left"></canvas>
-        <div style="font:Comic Sans MS; font-size: 30px"><b id='hp'></b></div>
+        <canvas id="ctx" width="500" height="500"></canvas>
+        <div><b id='hp'></b></div>
     </body>
     <script>
         var socket = io.connect('http://localhost:8899');
