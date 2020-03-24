@@ -1,3 +1,5 @@
+const constants = require('./constants');
+
 module.exports = {
     makeBullet: function(player, dst, counter) {
         return new Bullet(player, dst, counter);
@@ -43,7 +45,8 @@ function updateBullets(bullets) {
     var toRemove = [];
     for (let id in bullets) {
         bullets[id].updatePos();
-        if (offScreen(bullets[id], 0, 0, 500, 500)) {
+        if (offScreen(bullets[id], constants.X_MIN, constants.Y_MIN,
+            constants.X_MAX, constants.Y_MAX)) {
             toRemove.push(id);
         }
     }

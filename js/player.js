@@ -1,3 +1,5 @@
+const constants = require('./constants');
+
 module.exports = {
     makePlayer: function() {
         var start = getStartingPos();
@@ -5,8 +7,8 @@ module.exports = {
     }
 };
 
-const XWALLS = [0, 500];
-const YWALLS = [0, 500];
+const XWALLS = [constants.X_MIN, constants.X_MAX];
+const YWALLS = [constants.Y_MIN, constants.Y_MAX];
 const RADIUS = 20;
 
 function getRandomIntRange(min, max) {
