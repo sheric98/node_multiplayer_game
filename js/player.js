@@ -1,5 +1,6 @@
 const collJS = require('./collision');
 const mapJS = require('./map')
+const constants = require('./constants');
 
 module.exports = {
     makePlayer: function() {
@@ -8,8 +9,8 @@ module.exports = {
     }
 };
 
-const XWALLS = [0, 500];
-const YWALLS = [0, 500];
+const XWALLS = [constants.X_MIN, constants.X_MAX];
+const YWALLS = [constants.Y_MIN, constants.Y_MAX];
 const RADIUS = 20;
 const OBJCENTER = [50, 50];
 const GAMEMAP = mapJS.generateMap();
@@ -35,6 +36,7 @@ function Player(startX, startY) {
     this.speedX = 0;
     this.speedY = 0;
     this.radius = RADIUS;
+    this.bullets = new Object();
     this.keys = [false, false, false, false];
     this.updateSpeed = function() {
         if (this.keys[0] || this.keys[1]) {

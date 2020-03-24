@@ -16,7 +16,6 @@ app.get('/', function(req, res) {
 
 var sockets = new Object();
 var players = new Object();
-var bullets = new Object();
 var bulletCounter = 0;
 
 io.sockets.on('connection', function(socket) {
@@ -45,7 +44,7 @@ io.sockets.on('connection', function(socket) {
             var player = players[socket.id];
             var bullet = bulletJS.makeBullet(player, dst, bulletCounter);
             bulletCounter++;
-            bullets[bullet.id] = [bullet, socket.id];
+            player.bullets[bullet.id] = bullet;
         }
     });
 });
@@ -54,20 +53,21 @@ setInterval(sendUpdate, 1000 / 60);
 
 function sendUpdate() {
     updatePlayers();
-    bulletJS.updateBullets(bullets);
-    collJS.checkHits(players, bullets);
-    io.emit('update', players, bullets);
+    collJS.checkHits(players);
+    io.emit('update', players);
 }
 
 function updatePlayers() {
     var toRemove = [];
     for (let id in players) {
-        if (players[id].hp <= 0) {
+        var player = players[id];
+        if (player.hp <= 0) {
             toRemove.push(id);
             sockets[id].emit('dead');
         }
         else {
-            players[id].updatePos();
+            player.updatePos();
+            bulletJS.updateBullets(player.bullets);
         }
     }
     for (let id of toRemove) {
