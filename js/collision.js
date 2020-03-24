@@ -1,6 +1,12 @@
 module.exports = {
-    checkHits: function(players, bullets) {
+    checkHits: function (players, bullets) {
         checkHits(players, bullets);
+    },
+    playerObjectCollision: function (player, gameMap) {
+        playerObjectCollision(player, gameMap);
+    },
+    playerWallCollision: function (player, wall, Xcoord) {
+        playerWallCollision(player, wall, Xcoord);
     }
 }
 
@@ -38,4 +44,38 @@ function checkHits(players, bullets) {
     for (let bID of toRemove) {
         delete bullets[bID];
     }
+}
+
+function getObjectPos(gameMap) {
+    var coordinates = [];
+    gameMap.forEach((tile, i) => {
+        if (tile == 0) {
+            let mult = i % 10 + 1;
+            coordinates.push([mult * OBJCENTER[0] - 25,
+                Math.floor((i / 10) + 1) * OBJCENTER[1] - 25]);
+        }
+    });
+    return coordinates;
+}
+
+function playerObjectCollision(player, gameMap) {
+    var coord;
+    var coordinates = getObjectPos(gameMap);
+    for (let coordinate of coordinates) {
+        let coordX = player.x - coordinate[0];
+        let coordY = player.y - coordinate[1];
+        coord = Math.sqrt(coordX * coordX + coordY * coordY);
+        return [coord <= player.radius + OBJCENTER[0], player.x, player.y];
+    }
+}
+
+function playerWallCollision(player, wall, Xcoord) {
+    var coord;
+    if (Xcoord) {
+        coord = player.x;
+    }
+    else {
+        coord = player.y;
+    }
+    return [Math.abs(wall - coord) <= player.radius, wall < coord];
 }

@@ -5,6 +5,7 @@ const io = require('socket.io')(http);
 const playerJS = require('./js/player');
 const bulletJS = require('./js/bullet');
 const collJS = require('./js/collision');
+const mapJS = require('./js/map')
 
 app.use(express.static('client'));
 

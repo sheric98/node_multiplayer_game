@@ -7,9 +7,51 @@
         <script src="js/draw.js"></script>
     </head>
     <body>
-        <canvas id="ctx" width="500" height="500"></canvas>
-        <div><b id='hp'></b></div>
+        <div id="wrapper">
+            <canvas id="background" width="500" height="500" style="position:
+            absolute; z-index: 0;"></canvas>
+            <canvas id="ctx" width="500" height="500" style="position: absolute;
+            z-index: 1;"></canvas>
+        </div>
+        <div id="info"><b class='unselectable' id='hp'></b></div>
     </body>
+    <script>
+        var img = new Image();
+        img.src = 'static/bush.png';
+        var background = document.getElementById('background').getContext('2d');
+        background.fillStyle = '#B0E0E6'; // blue
+        var gameMap = [];
+        var length = 100;
+        for (var i = 0; i < length; i++) {
+            let x = Math.round(Math.random());
+            gameMap.push(1);
+        }
+        gameMap[50] = 0;
+        gameMap[51] = 0;
+        gameMap[52] = 0;
+        gameMap[53] = 0;
+        gameMap[54] = 0;
+        gameMap[55] = 0;
+
+        function loadMap() {
+            if (background == null) { return; }
+            for (var y = 0; y < 10; y++) {
+                for (var x = 0; x < 10; x++) {
+                    switch (gameMap[((y * 10) + x)]) {
+                        case 0:
+                                background.drawImage(img, x * 50 + 15, y * 50 + 20);
+                                break;
+                        default:
+                                background.fillRect(x * 50, y * 50, 50, 50);
+                    }
+                }
+            }
+        }
+
+        window.onload = function() {
+            requestAnimationFrame(loadMap);
+        }
+    </script>
     <script>
         var socket = io.connect('http://localhost:8899');
 
@@ -81,9 +123,9 @@
                 }
                 else {
                     color = 'red';
-                    drawHP(ctx, player);
                 }
                 drawObj(ctx, player, color);
+                drawHP(ctx, player);
             }
             for (let id in bullets) {
                 var color;
@@ -101,13 +143,6 @@
             alive = false;
             alert('You are dead.');
         });
-
-        function update() {
-            clearCtx();
-            me.updatePos();
-            me.draw();
-            updateBullets(bullets);
-        }
 
     </script>
 </html>

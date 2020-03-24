@@ -1,3 +1,6 @@
+const collJS = require('./collision');
+const mapJS = require('./map')
+
 module.exports = {
     makePlayer: function() {
         var start = getStartingPos();
@@ -8,6 +11,8 @@ module.exports = {
 const XWALLS = [0, 500];
 const YWALLS = [0, 500];
 const RADIUS = 20;
+const OBJCENTER = [50, 50];
+const GAMEMAP = mapJS.generateMap();
 
 function getRandomIntRange(min, max) {
     var rand = Math.random();
@@ -20,17 +25,6 @@ function getStartingPos() {
     var xRand = getRandomIntRange(xRange[0], xRange[1]);
     var yRand = getRandomIntRange(yRange[0], yRange[1]);
     return {x: xRand, y: yRand};
-}
-
-function playerWallCollision(player, wall, Xcoord) {
-    var coord;
-    if (Xcoord) {
-        coord = player.x;
-    }
-    else {
-        coord = player.y;
-    }
-    return [Math.abs(wall - coord) <= player.radius, wall < coord];
 }
 
 function Player(startX, startY) {
@@ -77,7 +71,7 @@ function Player(startX, startY) {
         this.x += (this.speed * this.speedX);
         this.y += (this.speed * this.speedY);
         for (let xWall of XWALLS) {
-            var collideX = playerWallCollision(this, xWall, true);
+            var collideX = collJS.playerWallCollision(this, xWall, true);
             if (collideX[0]) {
                 var sign = collideX[1] ? 1 : -1;
                 this.x = xWall + (sign * this.radius);
@@ -85,12 +79,19 @@ function Player(startX, startY) {
             }
         }
         for (let yWall of YWALLS) {
-            var collideY = playerWallCollision(this, yWall, false);
+            var collideY = collJS.playerWallCollision(this, yWall, false);
             if (collideY[0]) {
                 var sign = collideY[1] ? 1 : -1;
                 this.y = yWall + (sign * this.radius);
                 this.speedY = 0;
             }
+        }
+        var objColl = collJS.playerObjectCollision(this, GAMEMAP);
+        if (objColl[0]) {
+            this.x = objColl[1];
+            this.y = objColl[2];
+            this.speedX = 0;
+            this.speedY = 0;
         }
     }
     this.keydown = function(index) {

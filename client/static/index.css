@@ -8,15 +8,32 @@ body {
     font: 30px Helvetica, Arial;
 }
 
-div {
-    text-align: center;
+#wrapper {
+    top: 50%;
+    left: 50%;
+    margin-left: 500px;
+    margin-top: 100px;
+    /* transform: translate(30%, 50%); */
 }
 
-#ctx {
+#info {
+    margin-left: 300px;
+}
+
+canvas {
     border: 1px black solid;
-    padding-left: 0;
+    /* padding-left: 0;
     padding-right: 0;
     margin-left: auto;
     margin-right: auto;
-    display: block;
+    display: block; */
+}
+
+.unselectable {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
