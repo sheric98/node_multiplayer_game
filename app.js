@@ -5,6 +5,7 @@ const io = require('socket.io')(http);
 const playerJS = require('./js/player');
 const bulletJS = require('./js/bullet');
 const collJS = require('./js/collision');
+const collOptJS = require('./js/collOpt');
 
 app.use(express.static('client'));
 
@@ -15,31 +16,34 @@ app.get('/', function(req, res) {
 
 var sockets = new Object();
 var players = new Object();
+var areas = collOptJS.initAreas();
 var bulletCounter = 0;
 
 io.sockets.on('connection', function(socket) {
     sockets[socket.id] = socket;
-    players[socket.id] = playerJS.makePlayer();
+    players[socket.id] = playerJS.makePlayer(socket.id);
 
     socket.on('disconnect', function() {
         delete sockets[socket.id];
-        delete players[socket.id];
+        if (players.hasOwnProperty(socket.id)) { 
+            players[socket.id].remove(areas, players);
+        }
     });
 
     socket.on('keydown', function(index) {
-        if (socket.id in players) {
+        if (players.hasOwnProperty(socket.id)) {
             players[socket.id].keydown(index);
         }
     });
 
     socket.on('keyup', function(index) {
-        if (socket.id in players) {
+        if (players.hasOwnProperty(socket.id)) {
             players[socket.id].keyup(index);
         }
     });
 
     socket.on('shoot', function(dst) {
-        if (socket.id in players) {
+        if (players.hasOwnProperty(socket.id)) {
             var player = players[socket.id];
             var bullet = bulletJS.makeBullet(player, dst, bulletCounter);
             bulletCounter++;
@@ -52,7 +56,7 @@ setInterval(sendUpdate, 1000 / 60);
 
 function sendUpdate() {
     updatePlayers();
-    collJS.checkHits(players);
+    collOptJS.checkAreas(areas, players);
     io.emit('update', players);
 }
 
@@ -66,11 +70,12 @@ function updatePlayers() {
         }
         else {
             player.updatePos();
-            bulletJS.updateBullets(player.bullets);
+            bulletJS.updateBullets(areas, players, player.bullets);
+            player.checkedBullets.clear();
         }
     }
     for (let id of toRemove) {
-        delete players[id];
+        players[id].remove(areas, players);
     }
 }
 

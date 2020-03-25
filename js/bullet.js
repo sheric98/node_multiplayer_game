@@ -4,8 +4,8 @@ module.exports = {
     makeBullet: function(player, dst, counter) {
         return new Bullet(player, dst, counter);
     },
-    updateBullets: function(bullets) {
-        updateBullets(bullets)
+    updateBullets: function(areas, players, bullets) {
+        updateBullets(areas, players, bullets)
     }
 }
 
@@ -27,6 +27,7 @@ function offScreen(bullet, minX, minY, maxX, maxY) {
 
 function Bullet(player, dst, counter) {
     this.id = 'bullet' + counter.toString();
+    this.pID = player.id;
     var vect = makeUnitVector(player, dst);
     this.x = (player.radius * vect[0]) + player.x;
     this.y = (player.radius * vect[1]) + player.y;
@@ -35,13 +36,21 @@ function Bullet(player, dst, counter) {
     this.speed = 10;
     this.radius = 5;
     this.damage = 5;
+    this.areas = new Set();
     this.updatePos = function() {
         this.x += this.speed * this.speedX;
         this.y += this.speed * this.speedY;
     }
+    this.remove = function(areas, players) {
+        var player = players[this.pID];
+        for (let i of this.areas) {
+            areas[i].removeBullet(this.pID, this.id);
+        }
+        delete player.bullets[this.id];
+    }
 }
 
-function updateBullets(bullets) {
+function updateBullets(areas, players, bullets) {
     var toRemove = [];
     for (let id in bullets) {
         bullets[id].updatePos();
@@ -51,6 +60,6 @@ function updateBullets(bullets) {
         }
     }
     for (let id of toRemove) {
-        delete bullets[id];
+        bullets[id].remove(areas, players);
     }
 }
