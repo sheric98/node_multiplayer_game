@@ -3,9 +3,9 @@ const mapJS = require('./map')
 const collJS = require('./collision');
 
 module.exports = {
-    makePlayer: function() {
+    makePlayer: function(id) {
         var start = getStartingPos();
-        return new Player(start.x, start.y);
+        return new Player(id, start.x, start.y);
     }
 };
 
@@ -77,7 +77,8 @@ function playerWallUpdate(player) {
     }
 }
 
-function Player(startX, startY) {
+function Player(id, startX, startY) {
+    this.id = id;
     this.hp = 100;
     this.x = startX;
     this.y = startY;
@@ -87,6 +88,8 @@ function Player(startX, startY) {
     this.radius = RADIUS;
     this.bullets = new Object();
     this.keys = [false, false, false, false];
+    this.areas = new Set();
+    this.checkedBullets = new Set();
     this.updateSpeed = function() {
         playerSpeedUpdate(this);
     }
@@ -106,5 +109,14 @@ function Player(startX, startY) {
     }
     this.keyup = function(index) {
         this.keys[index] = false;
+    }
+    this.remove = function(areas, players) {
+        for (let bID in this.bullets) {
+            this.bullets[bID].remove();
+        }
+        for (let i of this.areas) {
+            areas[i].removePlayer(this.id);
+        }
+        delete players[this.id];
     }
 }
