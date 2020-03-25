@@ -55,10 +55,6 @@ function playerWallCollision(player, wall, Xcoord) {
 //     }
 // }
 
-function playerHit(player, playerId, bulletArr) {
-    return (bulletArr[1] != playerId && circleCollide(player, bulletArr[0]))
-}
-
 function checkHits(areas, players, toCheck, playerBulletsMap) {
     var toRemove = new Object();
 
