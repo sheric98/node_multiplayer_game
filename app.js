@@ -5,7 +5,7 @@ const io = require('socket.io')(http);
 const playerJS = require('./js/player');
 const bulletJS = require('./js/bullet');
 const collJS = require('./js/collision');
-const collOptJS = require('./js/collOpt');
+const areaJS = require('./js/area');
 
 app.use(express.static('client'));
 
@@ -16,7 +16,7 @@ app.get('/', function(req, res) {
 
 var sockets = new Object();
 var players = new Object();
-var areas = collOptJS.initAreas();
+var areas = areaJS.initAreas();
 var bulletCounter = 0;
 
 io.sockets.on('connection', function(socket) {
@@ -56,7 +56,8 @@ setInterval(sendUpdate, 1000 / 60);
 
 function sendUpdate() {
     updatePlayers();
-    collOptJS.checkAreas(areas, players);
+    areaJS.updateAreas(areas, players);
+    areaJS.checkAreas(areas, players);
     io.emit('update', players);
 }
 

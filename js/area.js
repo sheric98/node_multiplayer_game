@@ -5,6 +5,9 @@ module.exports = {
     initAreas: function() {
         return initAreas();
     },
+    updateAreas: function(areas, players) {
+        updateAreas(areas, players);
+    },
     checkAreas: function(areas, players) {
         checkAreas(areas, players);
     }
@@ -151,7 +154,7 @@ function updateAdditionObj(areas, obj, players, isPlayer, pID, bID = null) {
     }
 }
 
-function updateAdditions(areas, players) {
+function updateAreas(areas, players) {
     for (let pID in players) {
         var player = players[pID];
         updateAdditionObj(areas, player, players, true, pID);
@@ -163,7 +166,6 @@ function updateAdditions(areas, players) {
 }
 
 function checkAreas(areas, players) {
-    updateAdditions(areas, players);
     for (let area of areas) {
         collJS.checkHits(areas, players, area.players, area.playerBullets);
     }
