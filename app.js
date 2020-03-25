@@ -6,6 +6,7 @@ const playerJS = require('./js/player');
 const bulletJS = require('./js/bullet');
 const collJS = require('./js/collision');
 const areaJS = require('./js/area');
+const mapJS = require('./js/map')
 
 app.use(express.static('client'));
 
@@ -18,10 +19,12 @@ var sockets = new Object();
 var players = new Object();
 var areas = areaJS.initAreas();
 var bulletCounter = 0;
+var gameMap = mapJS.generateMap();
 
 io.sockets.on('connection', function(socket) {
     sockets[socket.id] = socket;
     players[socket.id] = playerJS.makePlayer(socket.id);
+    io.emit('generateMap', gameMap);
 
     socket.on('disconnect', function() {
         delete sockets[socket.id];

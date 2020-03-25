@@ -1,4 +1,6 @@
 const constants = require('./constants');
+const mapJS = require('./map')
+const collJS = require('./collision');
 
 module.exports = {
     makePlayer: function(id) {
@@ -10,6 +12,7 @@ module.exports = {
 const XWALLS = [constants.X_MIN, constants.X_MAX];
 const YWALLS = [constants.Y_MIN, constants.Y_MAX];
 const RADIUS = 20;
+var GAMEMAP = mapJS.generateMap();
 
 function getRandomIntRange(min, max) {
     var rand = Math.random();
@@ -24,15 +27,54 @@ function getStartingPos() {
     return {x: xRand, y: yRand};
 }
 
-function playerWallCollision(player, wall, Xcoord) {
-    var coord;
-    if (Xcoord) {
-        coord = player.x;
+function playerSpeedUpdate(player) {
+    if (player.keys[0] || player.keys[1]) {
+        if (player.keys[0] && player.keys[1]) {
+            player.speedX = 0;
+        }
+        else if (player.keys[0]) {
+            player.speedX = -1;
+        }
+        else {
+            player.speedX = 1;
+        }
     }
     else {
-        coord = player.y;
+        player.speedX = 0;
     }
-    return [Math.abs(wall - coord) <= player.radius, wall < coord];
+    if (player.keys[2] || player.keys[3]) {
+        if (player.keys[2] && player.keys[3]) {
+            player.speedY = 0;
+        }
+        else if (player.keys[2]) {
+            player.speedY = -1;
+        }
+        else {
+            player.speedY = 1;
+        }
+    }
+    else {
+        player.speedY = 0;
+    }
+}
+
+function playerWallUpdate(player) {
+    for (let xWall of XWALLS) {
+        var collideX = collJS.playerWall(player, xWall, true);
+        if (collideX[0]) {
+            var sign = collideX[1] ? 1 : -1;
+            player.x = xWall + (sign * player.radius);
+            player.speedX = 0;
+        }
+    }
+    for (let yWall of YWALLS) {
+        var collideY = collJS.playerWall(player, yWall, false);
+        if (collideY[0]) {
+            var sign = collideY[1] ? 1 : -1;
+            player.y = yWall + (sign * player.radius);
+            player.speedY = 0;
+        }
+    }
 }
 
 function Player(id, startX, startY) {
@@ -49,55 +91,18 @@ function Player(id, startX, startY) {
     this.areas = new Set();
     this.checkedBullets = new Set();
     this.updateSpeed = function() {
-        if (this.keys[0] || this.keys[1]) {
-            if (this.keys[0] && this.keys[1]) {
-                this.speedX = 0;
-            }
-            else if (this.keys[0]) {
-                this.speedX = -1;
-            }
-            else {
-                this.speedX = 1;
-            }
-        }
-        else {
-            this.speedX = 0;
-        }
-        if (this.keys[2] || this.keys[3]) {
-            if (this.keys[2] && this.keys[3]) {
-                this.speedY = 0;
-            }
-            else if (this.keys[2]) {
-                this.speedY = -1;
-            }
-            else {
-                this.speedY = 1;
-            }
-        }
-        else {
-            this.speedY = 0;
-        }
+        playerSpeedUpdate(this);
     }
     this.updatePos = function() {
         this.updateSpeed();
         this.x += (this.speed * this.speedX);
         this.y += (this.speed * this.speedY);
-        for (let xWall of XWALLS) {
-            var collideX = playerWallCollision(this, xWall, true);
-            if (collideX[0]) {
-                var sign = collideX[1] ? 1 : -1;
-                this.x = xWall + (sign * this.radius);
-                this.speedX = 0;
-            }
-        }
-        for (let yWall of YWALLS) {
-            var collideY = playerWallCollision(this, yWall, false);
-            if (collideY[0]) {
-                var sign = collideY[1] ? 1 : -1;
-                this.y = yWall + (sign * this.radius);
-                this.speedY = 0;
-            }
-        }
+        playerWallUpdate(this);
+        // var objColl = playerObjectCollision(this, GAMEMAP);
+        // if (objColl[0]) {
+        //     this.speedX = 0;
+        //     this.speedY = 0;
+        // }
     }
     this.keydown = function(index) {
         this.keys[index] = true;
