@@ -4,8 +4,6 @@ module.exports = {
     }
 }
 
-const OBJCENTER = [50, 50];
-
 function dist(a, b) {
     var distX = a.x - b.x;
     var distY = a.y - b.y;
