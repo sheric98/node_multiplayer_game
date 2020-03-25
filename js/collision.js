@@ -1,8 +1,13 @@
 module.exports = {
-    checkHits: function (players, bullets) {
+    checkHits: function(players, bullets) {
         checkHits(players, bullets);
+    },
+    playerWall: function(player, wall, Xcoord) {
+        return playerWallCollision(player, wall, Xcoord);
     }
 }
+
+// const OBJCENTER = [50, 50];
 
 function dist(a, b) {
     var distX = a.x - b.x;
@@ -15,6 +20,40 @@ function circleCollide(a, b) {
     var distance = dist(a, b);
     return distance <= thresh;
 }
+
+function playerWallCollision(player, wall, Xcoord) {
+    var coord;
+    if (Xcoord) {
+        coord = player.x;
+    }
+    else {
+        coord = player.y;
+    }
+    return [Math.abs(wall - coord) <= player.radius, wall < coord];
+}
+
+// function getObjectPos(gameMap) {
+//     var coordinates = [];
+//     gameMap.forEach((tile, i) => {
+//         if (tile == 0) {
+//             let mult = i % 10 + 1;
+//             coordinates.push([mult * OBJCENTER[0] - 25,
+//                 Math.floor((i / 10) + 1) * OBJCENTER[1] - 25]);
+//         }
+//     });
+//     return coordinates;
+// }
+//
+// function playerObjectCollision(player, gameMap) {
+//     var coord;
+//     var coordinates = getObjectPos(gameMap);
+//     for (let coordinate of coordinates) {
+//         let coordX = player.x - coordinate[0];
+//         let coordY = player.y - coordinate[1];
+//         coord = Math.sqrt(coordX * coordX + coordY * coordY);
+//         return [coord <= player.radius + OBJCENTER[0], player.x, player.y];
+//     }
+// }
 
 function playerHit(player, playerId, bulletArr) {
     return (bulletArr[1] != playerId && circleCollide(player, bulletArr[0]))
