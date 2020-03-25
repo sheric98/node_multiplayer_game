@@ -1,5 +1,5 @@
 module.exports = {
-    checkHits: function(players, bullets) {
+    checkHits: function (players, bullets) {
         checkHits(players, bullets);
     }
 }

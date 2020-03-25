@@ -1,4 +1,6 @@
+const collJS = require('./collision');
 const constants = require('./constants');
+const mapJS = require('./map')
 
 module.exports = {
     makePlayer: function() {
@@ -10,6 +12,8 @@ module.exports = {
 const XWALLS = [constants.X_MIN, constants.X_MAX];
 const YWALLS = [constants.Y_MIN, constants.Y_MAX];
 const RADIUS = 20;
+// const OBJCENTER = [50, 50];
+var GAMEMAP = mapJS.generateMap();
 
 function getRandomIntRange(min, max) {
     var rand = Math.random();
@@ -23,6 +27,29 @@ function getStartingPos() {
     var yRand = getRandomIntRange(yRange[0], yRange[1]);
     return {x: xRand, y: yRand};
 }
+
+// function getObjectPos(gameMap) {
+//     var coordinates = [];
+//     gameMap.forEach((tile, i) => {
+//         if (tile == 0) {
+//             let mult = i % 10 + 1;
+//             coordinates.push([mult * OBJCENTER[0] - 25,
+//                 Math.floor((i / 10) + 1) * OBJCENTER[1] - 25]);
+//         }
+//     });
+//     return coordinates;
+// }
+//
+// function playerObjectCollision(player, gameMap) {
+//     var coord;
+//     var coordinates = getObjectPos(gameMap);
+//     for (let coordinate of coordinates) {
+//         let coordX = player.x - coordinate[0];
+//         let coordY = player.y - coordinate[1];
+//         coord = Math.sqrt(coordX * coordX + coordY * coordY);
+//         return [coord <= player.radius + OBJCENTER[0], player.x, player.y];
+//     }
+// }
 
 function playerWallCollision(player, wall, Xcoord) {
     var coord;
@@ -95,6 +122,11 @@ function Player(startX, startY) {
                 this.speedY = 0;
             }
         }
+        // var objColl = playerObjectCollision(this, GAMEMAP);
+        // if (objColl[0]) {
+        //     this.speedX = 0;
+        //     this.speedY = 0;
+        // }
     }
     this.keydown = function(index) {
         this.keys[index] = true;
