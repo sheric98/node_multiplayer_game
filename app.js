@@ -17,10 +17,12 @@ app.get('/', function(req, res) {
 var sockets = new Object();
 var players = new Object();
 var bulletCounter = 0;
+var gameMap = mapJS.generateMap();
 
 io.sockets.on('connection', function(socket) {
     sockets[socket.id] = socket;
     players[socket.id] = playerJS.makePlayer();
+    io.emit('generateMap', gameMap);
 
     socket.on('disconnect', function() {
         delete sockets[socket.id];
