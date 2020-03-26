@@ -18,7 +18,7 @@ function GameMap() {
     testMap[13] = 0;
     testMap[50] = 0;
     testMap[51] = 0;
-    testMap[52] = 0;
+    testMap[52] = 2;
     testMap[53] = 0;
     testMap[54] = 0;
     testMap[55] = 0;
@@ -26,11 +26,12 @@ function GameMap() {
 }
 
 
-function Wall(x, y, width, height) {
+function Wall(x, y, width, height, collapsable) {
     this.x = x;
     this.y = y;
     this.width = width;
     this.height = height;
+    this.collapsable = collapsable;
     this.checkedPlayers = new Set();
     this.checkedBullets = new Set();
     this.reset = function() {
@@ -50,7 +51,10 @@ function makeWalls(gamemap) {
     gamemap.forEach((tile, i) => {
         if (gamemap[i] == 0) {
             var coord = indexToCoord(i);
-            walls.push(new Wall(coord[0], coord[1], 50, 50));
+            walls.push(new Wall(coord[0], coord[1], 50, 50, false));
+        } else if (gamemap[i] == 2) {
+            var coord = indexToCoord(i);
+            walls.push(new Wall(coord[0], coord[1], 50, 50, true));
         }
     });
     return walls;

@@ -2,8 +2,8 @@ const constants = require('./constants');
 const collJS = require('./collision');
 
 module.exports = {
-    makeBullet: function(player, dst, counter) {
-        return new Bullet(player, dst, counter);
+    makeBullet: function(player, dst, counter, io) {
+        return new Bullet(player, dst, counter, io);
     },
     updateBullets: function(areas, players, bullets) {
         updateBullets(areas, players, bullets)
@@ -26,7 +26,7 @@ function offScreen(bullet, minX, minY, maxX, maxY) {
         bullet.y > (maxY + bullet.radius));
 }
 
-function checkBulletWall(bullet, areas, players) {
+function checkBulletWall(bullet, areas, players, io) {
     for (let i of bullet.areas) {
         var area_walls = areas[i].walls;
         for (let wall of area_walls) {
@@ -34,13 +34,16 @@ function checkBulletWall(bullet, areas, players) {
                 wall.checkedPlayers.add(bullet.id);
                 if (collJS.circleBoxCollision(bullet, wall)) {
                     bullet.remove(areas, players);
+                    if (wall.collapsable) {
+                        io.emit('explosion', wall.x, wall.y);
+                    }
                 }
             }
         }
     }
 }
 
-function Bullet(player, dst, counter) {
+function Bullet(player, dst, counter, io) {
     this.id = 'bullet' + counter.toString();
     this.pID = player.id;
     var vect = makeUnitVector(player, dst);
@@ -57,7 +60,7 @@ function Bullet(player, dst, counter) {
         this.y += this.speed * this.speedY;
     }
     this.checkPos = function(areas, players) {
-        checkBulletWall(this, areas, players);
+        checkBulletWall(this, areas, players, io);
     }
     this.remove = function(areas, players) {
         var player = players[this.pID];

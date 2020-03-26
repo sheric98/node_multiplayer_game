@@ -40,8 +40,14 @@ function drawMap(background, gameMap) {
                         background.drawImage(img, x * 50 + 15,
                             y * 50 + 20);
                         break;
-                default:
+                case 2:
+                        background.fillStyle = '#FFFFFF'; // white
                         background.fillRect(x * 50, y * 50, 50, 50);
+                        break;
+                default:
+                        background.fillStyle = '#B0E0E6'; // blue
+                        background.fillRect(x * 50, y * 50, 50, 50);
+                        break;
             }
         }
     }
