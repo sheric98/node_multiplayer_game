@@ -5,6 +5,7 @@
         <link rel="stylesheet" type="text/css" href="static/index.css">
         <script src="../../socket.io/socket.io.js"></script>
         <script src="js/draw.js"></script>
+        <script src="js/audio.js"></script>
     </head>
     <body>
         <div id="wrapper">
@@ -118,6 +119,8 @@
                 }
             }
         });
+
+        socket.on('playSound', playSound);
 
         socket.on('dead', function() {
             alive = false;

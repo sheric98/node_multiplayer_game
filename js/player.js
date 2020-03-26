@@ -9,8 +9,8 @@ module.exports = {
         var start = getStartingPos();
         return new Player(id, start.x, start.y);
     },
-    updatePlayers: function(areas, players) {
-        updatePlayers(areas, players);
+    updatePlayers: function(sockets, areas, players) {
+        updatePlayers(sockets, areas, players);
     },
     checkPlayers: function(areas, players) {
         checkPlayers(areas, players);
@@ -155,6 +155,7 @@ function playerTouchWalls(areas, player, oldX, oldY) {
         player.x = oldX;
         player.y = oldY;
         stopSpeed(player, collides, oldX, oldY);
+        player.collisionAudio = true;
         return true;
     }
     return false;
@@ -175,6 +176,8 @@ function Player(id, startX, startY) {
     this.keys = [false, false, false, false];
     this.areas = new Set();
     this.checkedBullets = new Set();
+    this.collisionAudio = false;
+    this.bulletHitAudio = false;
     this.updateSpeed = function() {
         playerSpeedUpdate(this);
     }
@@ -206,12 +209,21 @@ function Player(id, startX, startY) {
     }
 }
 
-function updatePlayers(areas, players) {
+function updatePlayers(sockets, areas, players) {
     var toRemove = [];
     for (let id in players) {
         var player = players[id];
+        if (player.collisionAudio) {
+            sockets[id].emit('playSound', constants.COLLISIONSOUND);
+            player.collisionAudio = false;
+        }
+        if (player.bulletHitAudio) {
+            sockets[id].emit('playSound', constants.BULLETSOUND);
+            player.bulletHitAudio = false;
+        }
         if (player.hp <= 0) {
             toRemove.push(id);
+            sockets[id].emit('playSound', constants.DEATHSOUND);
             sockets[id].emit('dead');
         }
         else {
@@ -223,6 +235,7 @@ function updatePlayers(areas, players) {
     for (let id of toRemove) {
         players[id].remove(areas, players);
     }
+
 }
 
 function checkPlayers(areas, players) {

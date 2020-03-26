@@ -10,8 +10,6 @@ module.exports = {
     }
 }
 
-// const OBJCENTER = [50, 50];
-
 function dist(a, b) {
     var distX = a.x - b.x;
     var distY = a.y - b.y;
@@ -76,29 +74,6 @@ function playerWallCollision(player, wall, Xcoord) {
     return [Math.abs(wall - coord) <= player.radius, wall < coord];
 }
 
-// function getObjectPos(gameMap) {
-//     var coordinates = [];
-//     gameMap.forEach((tile, i) => {
-//         if (tile == 0) {
-//             let mult = i % 10 + 1;
-//             coordinates.push([mult * OBJCENTER[0] - 25,
-//                 Math.floor((i / 10) + 1) * OBJCENTER[1] - 25]);
-//         }
-//     });
-//     return coordinates;
-// }
-//
-// function playerObjectCollision(player, gameMap) {
-//     var coord;
-//     var coordinates = getObjectPos(gameMap);
-//     for (let coordinate of coordinates) {
-//         let coordX = player.x - coordinate[0];
-//         let coordY = player.y - coordinate[1];
-//         coord = Math.sqrt(coordX * coordX + coordY * coordY);
-//         return [coord <= player.radius + OBJCENTER[0], player.x, player.y];
-//     }
-// }
-
 function checkHits(areas, players, toCheck, playerBulletsMap) {
     var toRemove = new Object();
 
@@ -115,6 +90,7 @@ function checkHits(areas, players, toCheck, playerBulletsMap) {
                     var bullet = player2.bullets[bID];
                     if (!player.checkedBullets.has(bID)) {
                         if (circleCollide(player, bullet)) {
+                            player.bulletHitAudio = true;
                             player.hp -= bullet.damage;
                             if (player.hp < 0) {
                                 player.hp = 0;

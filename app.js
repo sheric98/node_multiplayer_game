@@ -29,7 +29,7 @@ io.sockets.on('connection', function(socket) {
 
     socket.on('disconnect', function() {
         delete sockets[socket.id];
-        if (players.hasOwnProperty(socket.id)) { 
+        if (players.hasOwnProperty(socket.id)) {
             players[socket.id].remove(areas, players);
         }
     });
@@ -59,7 +59,7 @@ io.sockets.on('connection', function(socket) {
 setInterval(sendUpdate, 1000 / 60);
 
 function sendUpdate() {
-    playerJS.updatePlayers(areas, players);
+    playerJS.updatePlayers(sockets, areas, players);
     areaJS.updateAreas(areas, players);
     playerJS.checkPlayers(areas, players);
     areaJS.checkAreas(areas, players);

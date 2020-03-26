@@ -5,4 +5,7 @@ module.exports = {
     Y_MAX: 500,
     X_SPLITS: 2,
     Y_SPLITS: 2,
+    DEATHSOUND: 0,
+    COLLISIONSOUND: 1,
+    BULLETSOUND: 2,
 }
