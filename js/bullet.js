@@ -34,8 +34,9 @@ function checkBulletWall(bullet, areas, players, io) {
                 wall.checkedPlayers.add(bullet.id);
                 if (collJS.circleBoxCollision(bullet, wall)) {
                     bullet.remove(areas, players);
-                    if (wall.collapsable) {
+                    if (wall.collapsible) {
                         io.emit('explosion', wall.x, wall.y);
+                        wall.collapsible = false;
                     }
                 }
             }

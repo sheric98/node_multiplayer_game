@@ -3,6 +3,7 @@
     <head>
         <title>CORONAVIRUS GAMES</title>
         <link rel="stylesheet" type="text/css" href="static/index.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="../../socket.io/socket.io.js"></script>
         <script src="js/draw.js"></script>
         <script src="js/audio.js"></script>
@@ -29,7 +30,7 @@
         var ctx = cvs.getContext('2d');
 
         var alive = true;
-        var explodeAnimation = [false, 0, 0];
+        var animations = [];
 
         function clearCtx() {
             ctx.clearRect(0, 0, cvs.width, cvs.height);
@@ -88,9 +89,8 @@
         });
 
         socket.on('explosion', function(x, y) {
-            explodeAnimation[0] = true;
-            explodeAnimation[1] = x;
-            explodeAnimation[2] = y;
+            var animation = makeExplosion(x, y, explosionSheet);
+            animations.push(animation);
         });
 
         socket.on('update', function (players) {
@@ -113,10 +113,7 @@
                 for (let bID in player.bullets) {
                     drawObj(ctx, player.bullets[bID], bColor);
                 }
-                if (explodeAnimation[0]) {
-                    explosion(background, animation, spriteSheet,
-                        explodeAnimation[1], explodeAnimation[2]);
-                }
+                explosion(background, animations, explosionSheet);
             }
         });
 

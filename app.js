@@ -62,7 +62,7 @@ setInterval(sendUpdate, 1000 / 60);
 function sendUpdate() {
     playerJS.updatePlayers(sockets, areas, players);
     areaJS.updateAreas(areas, players);
-    playerJS.checkPlayers(areas, players);
+    playerJS.checkPlayers(sockets, areas, players);
     areaJS.checkAreas(areas, players);
     mapJS.resetWallChecks(walls);
     io.emit('update', players);

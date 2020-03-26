@@ -1,6 +1,8 @@
 const SPRITE_SIZE = 50;
 
-function Animation(frameSet, delay, spriteSheetLen) {
+function Animation(x, y, frameSet, delay, spriteSheetLen) {
+    this.x = x;
+    this.y = y;
     // game cycle count since last frame
     this.count = 0;
     // num of game cycles until next frame change
@@ -23,6 +25,8 @@ function Animation(frameSet, delay, spriteSheetLen) {
             this.frameSet = frameSet;
             this.frame = this.frameSet[this.frameIndex];
             this.animationLen = spriteLen;
+            this.frameCycle = 0;
+            this.stop = false;
         }
     };
 
@@ -48,23 +52,31 @@ function Animation(frameSet, delay, spriteSheetLen) {
     };
 }
 
-var animation = new Animation();
-
-var spriteSheet = new Object();
-spriteSheet = {
+var explosionSheet = new Object();
+explosionSheet = {
     frameSets : [[0, 1, 2, 3, 4, 5]],
     image : new Image(),
 }
-spriteSheet.image.src = '../static/img/explosion.png';
+explosionSheet.image.src = '../static/img/explosion.png';
 
-function explosion(ctx, animation, sheet, x, y) {
-    if (animation.stop) {
-        ctx.fillStyle = '#FFFFFF'; // white
-        ctx.fillRect(x, y, 50, 50);
-    } else {
-        animation.change(sheet.frameSets[0], 12, sheet.frameSets.length);
-        ctx.drawImage(sheet.image, animation.frame * SPRITE_SIZE, 0, SPRITE_SIZE,
-            SPRITE_SIZE, x, y, SPRITE_SIZE, SPRITE_SIZE);
-        animation.update();
-    }
+function makeExplosion(x, y, sheet) {
+    animation = new Animation();
+    animation.x = x;
+    animation.y = y;
+    animation.change(sheet.frameSets[0], 12, sheet.frameSets.length);
+    return animation;
+}
+
+function explosion(ctx, anims, sheet) {
+    anims.forEach((anim, i) => {
+        if (anim.stop) {
+            anims.splice(i, 1);
+            ctx.fillStyle = '#FFFFFF'; // white
+            ctx.fillRect(anim.x, anim.y, SPRITE_SIZE, SPRITE_SIZE);
+        } else {
+            ctx.drawImage(sheet.image, anim.frame * SPRITE_SIZE, 5, SPRITE_SIZE,
+                SPRITE_SIZE, anim.x, anim.y, SPRITE_SIZE, SPRITE_SIZE);
+            anim.update();
+        }
+    });
 }
