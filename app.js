@@ -20,11 +20,12 @@ var players = new Object();
 var bulletCounter = 0;
 var gameMap = mapJS.generateMap();
 var walls = mapJS.makeWalls(gameMap);
+var availPos = mapJS.getAvailablePos(walls);
 var areas = areaJS.initAreas(walls);
 
 io.sockets.on('connection', function(socket) {
     sockets[socket.id] = socket;
-    players[socket.id] = playerJS.makePlayer(socket.id);
+    players[socket.id] = playerJS.makePlayer(socket.id, availPos);
     io.emit('generateMap', gameMap);
 
     socket.on('disconnect', function() {
