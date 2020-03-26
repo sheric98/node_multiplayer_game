@@ -17,9 +17,10 @@ app.get('/', function(req, res) {
 
 var sockets = new Object();
 var players = new Object();
-var areas = areaJS.initAreas();
 var bulletCounter = 0;
 var gameMap = mapJS.generateMap();
+var walls = mapJS.makeWalls(gameMap);
+var areas = areaJS.initAreas(walls);
 
 io.sockets.on('connection', function(socket) {
     sockets[socket.id] = socket;
@@ -58,29 +59,12 @@ io.sockets.on('connection', function(socket) {
 setInterval(sendUpdate, 1000 / 60);
 
 function sendUpdate() {
-    updatePlayers();
+    playerJS.updatePlayers(areas, players);
     areaJS.updateAreas(areas, players);
+    playerJS.checkPlayers(areas, players);
     areaJS.checkAreas(areas, players);
+    mapJS.resetWallChecks(walls);
     io.emit('update', players);
-}
-
-function updatePlayers() {
-    var toRemove = [];
-    for (let id in players) {
-        var player = players[id];
-        if (player.hp <= 0) {
-            toRemove.push(id);
-            sockets[id].emit('dead');
-        }
-        else {
-            player.updatePos();
-            bulletJS.updateBullets(areas, players, player.bullets);
-            player.checkedBullets.clear();
-        }
-    }
-    for (let id of toRemove) {
-        players[id].remove(areas, players);
-    }
 }
 
 const server = http.listen(8899, function() {

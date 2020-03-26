@@ -4,6 +4,9 @@ module.exports = {
     },
     playerWall: function(player, wall, Xcoord) {
         return playerWallCollision(player, wall, Xcoord);
+    },
+    circleBoxCollision: function(circle, box) {
+        return circleBoxCollision(circle, box);
     }
 }
 
@@ -19,6 +22,47 @@ function circleCollide(a, b) {
     var thresh = a.radius + b.radius;
     var distance = dist(a, b);
     return distance <= thresh;
+}
+
+function intersectingLines(x1_min, x1_max, x2_min, x2_max) {
+    return ((x1_min >= x2_min && x1_min <= x2_max) ||
+        (x1_max >= x2_min && x1_max <= x2_max) ||
+        (x1_min <= x2_min && x1_max >= x2_max));
+}
+
+function boxCollision(x1_min, x1_max, x2_min, x2_max,
+    y1_min, y1_max, y2_min, y2_max) {
+    return intersectingLines(x1_min, x1_max, x2_min, x2_max) &&
+    intersectingLines(y1_min, y1_max, y2_min, y2_max);
+}
+
+function closestPointLine(x, xMin, xMax) {
+    if (x >= xMin && x <= xMax) {
+        return x;
+    }
+    else if (x < xMin) {
+        return xMin;
+    }
+    else {
+        return xMax;
+    }
+}
+
+function closestPoint(circle, box) {
+    var x, y;
+    var xMin = box.x;
+    var xMax = box.x + box.width;
+    var yMin = box.y;
+    var yMax = box.y + box.height;
+
+    pointX = closestPointLine(circle.x, xMin, xMax);
+    pointY = closestPointLine(circle.y, yMin, yMax);
+    return {x: pointX, y: pointY};
+}
+
+function circleBoxCollision(circle, box) {
+    var closest = closestPoint(circle, box);
+    return (dist(circle, closest) <= circle.radius);
 }
 
 function playerWallCollision(player, wall, Xcoord) {

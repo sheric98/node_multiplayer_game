@@ -2,8 +2,8 @@ const constants = require('./constants');
 const collJS = require('./collision');
 
 module.exports = {
-    initAreas: function() {
-        return initAreas();
+    initAreas: function(walls) {
+        return initAreas(walls);
     },
     updateAreas: function(areas, players) {
         updateAreas(areas, players);
@@ -49,6 +49,7 @@ function setDiff(a, b) {
 function Area() {
     this.players = new Set();
     this.playerBullets = new Map();
+    this.walls = [];
     this.addPlayer = function(id) {
         this.players.add(id);
     }
@@ -62,18 +63,29 @@ function Area() {
         this.playerBullets.get(pID).add(bID);
     }
     this.removeBullet = function(pID, bID) {
-        var pbSet = this.playerBullets.get(pID);
-        pbSet.delete(bID);
-        if (pbSet.size == 0) {
-            this.playerBullets.delete(pID);
+        if (this.playerBullets.has(pID)) {
+            var pbSet = this.playerBullets.get(pID);
+            pbSet.delete(bID);
+            if (pbSet.size == 0) {
+                this.playerBullets.delete(pID);
+            }
         }
+    }
+    this.addWall = function(wall) {
+        this.walls.push(wall);
     }
 }
 
-function initAreas() {
+function initAreas(walls) {
     var areas = [];
     for (let i = 0; i < (X_SPLITS * Y_SPLITS); i++) {
         areas.push(new Area());
+    }
+    for (let wall of walls) {
+        var occupiedAreas = boxToAreas(wall);
+        for (let i of occupiedAreas) {
+            areas[i].addWall(wall);
+        }
     }
     return areas;
 }
@@ -113,7 +125,18 @@ function rangesToAreas(x_range, y_range) {
     return ret;
 }
 
-function objectToAreas(obj) {
+function boxToAreas(box) {
+    var x_min = box.x;
+    var x_max = box.x + box.width;
+    var y_min = box.y;
+    var y_max = box.y + box.height;
+
+    var x_range = minMaxToIndices(x_min, x_max, true);
+    var y_range = minMaxToIndices(y_min, y_max, false);
+    return rangesToAreas(x_range, y_range);
+}
+
+function circlesToAreas(obj) {
     var x_min = obj.x - obj.radius;
     var x_max = obj.x + obj.radius;
     var y_min = obj.y - obj.radius;
@@ -125,7 +148,7 @@ function objectToAreas(obj) {
 }
 
 function updateAdditionObj(areas, obj, players, isPlayer, pID, bID = null) {
-    var occupiedAreas = objectToAreas(obj);
+    var occupiedAreas = circlesToAreas(obj);
     var noLongerIn = setDiff(obj.areas, occupiedAreas);
     var cameInto = setDiff(occupiedAreas, obj.areas);
 

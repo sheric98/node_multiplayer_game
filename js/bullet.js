@@ -1,4 +1,5 @@
 const constants = require('./constants');
+const collJS = require('./collision');
 
 module.exports = {
     makeBullet: function(player, dst, counter) {
@@ -25,6 +26,20 @@ function offScreen(bullet, minX, minY, maxX, maxY) {
         bullet.y > (maxY + bullet.radius));
 }
 
+function checkBulletWall(bullet, areas, players) {
+    for (let i of bullet.areas) {
+        var area_walls = areas[i].walls;
+        for (let wall of area_walls) {
+            if (!wall.checkedBullets.has(bullet.id)) {
+                wall.checkedPlayers.add(bullet.id);
+                if (collJS.circleBoxCollision(bullet, wall)) {
+                    bullet.remove(areas, players);
+                }
+            }
+        }
+    }
+}
+
 function Bullet(player, dst, counter) {
     this.id = 'bullet' + counter.toString();
     this.pID = player.id;
@@ -40,6 +55,9 @@ function Bullet(player, dst, counter) {
     this.updatePos = function() {
         this.x += this.speed * this.speedX;
         this.y += this.speed * this.speedY;
+    }
+    this.checkPos = function(areas, players) {
+        checkBulletWall(this, areas, players);
     }
     this.remove = function(areas, players) {
         var player = players[this.pID];
