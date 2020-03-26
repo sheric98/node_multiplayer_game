@@ -5,7 +5,9 @@ module.exports = {
     Y_MAX: 500,
     X_SPLITS: 2,
     Y_SPLITS: 2,
+    PLAYER_RADIUS: 20,
     DEATHSOUND: 0,
     COLLISIONSOUND: 1,
     BULLETSOUND: 2,
+    WALL_FREQ: .1
 }

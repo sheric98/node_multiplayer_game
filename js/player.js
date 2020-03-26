@@ -5,8 +5,8 @@ const bulletJS = require('./bullet');
 const areaJS = require('./area');
 
 module.exports = {
-    makePlayer: function(id) {
-        var start = getStartingPos();
+    makePlayer: function(id, availablePos) {
+        var start = getStartingPos(availablePos);
         return new Player(id, start.x, start.y);
     },
     updatePlayers: function(sockets, areas, players) {
@@ -19,20 +19,23 @@ module.exports = {
 
 const XWALLS = [constants.X_MIN, constants.X_MAX];
 const YWALLS = [constants.Y_MIN, constants.Y_MAX];
-const RADIUS = 20;
-var GAMEMAP = mapJS.generateMap();
+const RADIUS = constants.PLAYER_RADIUS;
 
 function getRandomIntRange(min, max) {
     var rand = Math.random();
     return Math.round((max - min) * rand) + min;
 }
 
-function getStartingPos() {
-    var xRange = [XWALLS[0] + RADIUS, XWALLS[1] - RADIUS];
-    var yRange = [YWALLS[0] + RADIUS, YWALLS[1] - RADIUS];
-    var xRand = getRandomIntRange(xRange[0], xRange[1]);
-    var yRand = getRandomIntRange(yRange[0], yRange[1]);
-    return {x: xRand, y: yRand};
+function getStartingPos(availablePos) {
+    // var xRange = [XWALLS[0] + RADIUS, XWALLS[1] - RADIUS];
+    // var yRange = [YWALLS[0] + RADIUS, YWALLS[1] - RADIUS];
+    // var xRand = getRandomIntRange(xRange[0], xRange[1]);
+    // var yRand = getRandomIntRange(yRange[0], yRange[1]);
+    // return {x: xRand, y: yRand};
+    var len = availablePos.length;
+    var startIndex = availablePos[getRandomIntRange(0, len - 1)];
+    var coord = mapJS.indexToCoord(startIndex);
+    return {x: coord[0], y: coord[1]};
 }
 
 function playerSpeedUpdate(player) {
