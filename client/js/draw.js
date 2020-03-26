@@ -30,3 +30,19 @@ function drawHP(ctx, player) {
         ctx.fillRect(x+greenLen, y, redLen, HP_HEIGHT);
     }
 }
+
+function drawMap(background, gameMap) {
+    if (background == null) { return; }
+    for (var y = 0; y < 10; y++) {
+        for (var x = 0; x < 10; x++) {
+            switch (gameMap[((y * 10) + x)]) {
+                case 0:
+                        background.drawImage(img, x * 50 + 15,
+                            y * 50 + 20);
+                        break;
+                default:
+                        background.fillRect(x * 50, y * 50, 50, 50);
+            }
+        }
+    }
+}

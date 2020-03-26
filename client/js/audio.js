@@ -1,10 +1,12 @@
 var collisionSound = new Audio;
 var deathSound = new Audio;
 var bulletHitSound = new Audio;
+var shotSound = new Audio;
 
 collisionSound.src = '../static/audio/Boing.m4a';
 deathSound.src = '../static/audio/Death.m4a'
 bulletHitSound.src = '../static/audio/Ouch.m4a'
+shotSound.src = '../static/audio/Pew.m4a'
 
 function playCollision() {
     collisionSound.play();
@@ -16,6 +18,10 @@ function playDeath() {
 
 function playBulletHit() {
     bulletHitSound.play();
+}
+
+function playShot() {
+    shotSound.play();
 }
 
 function playSound(soundNumber) {
