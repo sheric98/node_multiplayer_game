@@ -200,7 +200,7 @@ function Player(id, startX, startY) {
     }
     this.remove = function(areas, players) {
         for (let bID in this.bullets) {
-            this.bullets[bID].remove();
+            this.bullets[bID].remove(areas, players);
         }
         for (let i of this.areas) {
             areas[i].removePlayer(this.id);
