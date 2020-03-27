@@ -23,17 +23,22 @@ function range(size, startAt = 0) {
 }
 
 function GameMap() {
-    const testMap = [];
-    for (let i = 0; i < 100; i++) {
+    this.width = constants.X_MAX;
+    this.height = constants.Y_MAX;
+    this.x_tiles = Math.floor(this.width / constants.TILE_X);
+    this.y_tiles = Math.floor(this.height / constants.TILE_Y);
+    this.tile_width = constants.TILE_X;
+    this.tile_height = constants.TILE_Y;
+    this.tiles = [];
+    for (let i = 0; i < (this.x_tiles * this.y_tiles); i++) {
         var rand = Math.random();
         if (rand < constants.WALL_FREQ) {
-            testMap.push(0);
+            this.tiles.push(0);
         }
         else {
-            testMap.push(1);
+            this.tiles.push(1);
         }
     }
-    return testMap;
 }
 
 function Wall(x, y, width, height, collapsible) {
@@ -62,10 +67,11 @@ function coordToIndex(x, y, xLen) {
 
 function makeWalls(gamemap) {
     var walls = [];
-    gamemap.forEach((tile, i) => {
-        if (gamemap[i] == 0) {
-            var coord = indexToCoord(i, 10, 50, 50);
-            walls.push(new Wall(coord[0], coord[1], 50, 50, true));
+    var xLen = gamemap.x_tiles;
+    gamemap.tiles.forEach((tile, i) => {
+        if (gamemap.tiles[i] == 0) {
+            var coord = indexToCoord(i, xLen, constants.TILE_X, constants.TILE_Y);
+            walls.push(new Wall(coord[0], coord[1], constants.TILE_X, constants.TILE_Y, true));
         }
     });
     return walls;

@@ -65,7 +65,7 @@ function sendUpdate() {
     playerJS.checkPlayers(sockets, areas, players);
     areaJS.checkAreas(areas, players);
     mapJS.resetWallChecks(walls);
-    io.emit('update', players);
+    io.emit('update', players, gameMap);
 }
 
 const server = http.listen(8899, function() {

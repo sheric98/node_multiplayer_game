@@ -33,20 +33,22 @@ function drawHP(ctx, player) {
 
 function drawMap(background, gameMap) {
     if (background == null) { return; }
-    for (var y = 0; y < 10; y++) {
-        for (var x = 0; x < 10; x++) {
-            switch (gameMap[((y * 10) + x)]) {
+    for (var y = 0; y < gameMap.y_tiles; y++) {
+        for (var x = 0; x < gameMap.x_tiles; x++) {
+            switch (gameMap.tiles[((y * gameMap.x_tiles) + x)]) {
                 case 0:
-                        background.drawImage(img, x * 50 + 15,
-                            y * 50 + 20);
+                        background.drawImage(img, x * gameMap.tile_width + 15,
+                            y * gameMap.tile_height + 20);
                         break;
                 case 2:
                         background.fillStyle = '#FFFFFF'; // white
-                        background.fillRect(x * 50, y * 50, 50, 50);
+                        background.fillRect(x * gameMap.tile_width,
+                            y * gameMap.tile_height,gameMap.tile_width, gameMap.tile_height);
                         break;
                 default:
                         background.fillStyle = '#B0E0E6'; // blue
-                        background.fillRect(x * 50, y * 50, 50, 50);
+                        background.fillRect(x * gameMap.tile_width,
+                            y * gameMap.tile_height, gameMap.tile_width, gameMap.tile_height);
                         break;
             }
         }
