@@ -49,6 +49,8 @@ io.sockets.on('connection', function(socket) {
     socket.on('shoot', function(dst) {
         if (players.hasOwnProperty(socket.id)) {
             var player = players[socket.id];
+            dst.x += player.camera.x;
+            dst.y += player.camera.y;
             var bullet = bulletJS.makeBullet(player, dst, bulletCounter, io);
             bulletCounter++;
             player.bullets[bullet.id] = bullet;
