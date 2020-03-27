@@ -26,7 +26,6 @@ var areas = areaJS.initAreas(walls);
 io.sockets.on('connection', function(socket) {
     sockets[socket.id] = socket;
     players[socket.id] = playerJS.makePlayer(socket.id, availPos);
-    io.emit('generateMap', gameMap);
 
     socket.on('disconnect', function() {
         delete sockets[socket.id];
@@ -65,7 +64,7 @@ function sendUpdate() {
     playerJS.checkPlayers(sockets, areas, players);
     areaJS.checkAreas(areas, players);
     mapJS.resetWallChecks(walls);
-    io.emit('update', players);
+    io.emit('update', players, gameMap);
 }
 
 const server = http.listen(8899, function() {

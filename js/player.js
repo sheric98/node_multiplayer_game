@@ -3,6 +3,7 @@ const mapJS = require('./map')
 const collJS = require('./collision');
 const bulletJS = require('./bullet');
 const areaJS = require('./area');
+const camJS = require('./camera');
 
 module.exports = {
     makePlayer: function(id, availablePos) {
@@ -27,11 +28,6 @@ function getRandomIntRange(min, max) {
 }
 
 function getStartingPos(availablePos) {
-    // var xRange = [XWALLS[0] + RADIUS, XWALLS[1] - RADIUS];
-    // var yRange = [YWALLS[0] + RADIUS, YWALLS[1] - RADIUS];
-    // var xRand = getRandomIntRange(xRange[0], xRange[1]);
-    // var yRand = getRandomIntRange(yRange[0], yRange[1]);
-    // return {x: xRand, y: yRand};
     var len = availablePos.length;
     var startIndex = availablePos[getRandomIntRange(0, len - 1)];
     var coord = mapJS.indexToCoord(startIndex);
@@ -179,6 +175,10 @@ function Player(id, startX, startY) {
     this.areas = new Set();
     this.checkedBullets = new Set();
     this.bulletHitAudio = false;
+    this.camera = camJS.makeCamera(this);
+    this.updateCam = function() {
+        this.camera.update(this.x, this.y);
+    }
     this.updateSpeed = function() {
         playerSpeedUpdate(this);
     }
@@ -189,9 +189,11 @@ function Player(id, startX, startY) {
         this.x += (this.speed * this.speedX);
         this.y += (this.speed * this.speedY);
     }
-    this.checkPos = function(areas) {
+    this.checkPos = function(areas, players) {
         playerWallUpdate(this);
-        return playerTouchWalls(areas, this, this.oldX, this.oldY);
+        var ret = playerTouchWalls(areas, this, this.oldX, this.oldY);
+        this.updateCam();
+        return ret;
     }
     this.keydown = function(index) {
         this.keys[index] = true;
@@ -239,7 +241,7 @@ function checkPlayers(sockets, areas, players) {
     var toAdjust = new Object();
     for (let pID in players) {
         var player = players[pID];
-        if (player.checkPos(areas)) {
+        if (player.checkPos(areas, players)) {
             toAdjust[pID] = player;
             sockets[pID].emit('playSound', constants.COLLISIONSOUND);
         }

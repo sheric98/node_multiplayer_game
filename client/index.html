@@ -21,19 +21,27 @@
     <script>
         var img = new Image();
         img.src = 'static/img/bush.png';
-        var background = document.getElementById('background').getContext('2d');
     </script>
     <script>
         var socket = io.connect('http://localhost:8899');
 
         var cvs = document.getElementById('ctx');
         var ctx = cvs.getContext('2d');
+        var background = document.getElementById('background').getContext('2d');
 
         var alive = true;
         var animations = [];
 
         function clearCtx() {
+            ctx.setTransform(1,0,0,1,0,0);
             ctx.clearRect(0, 0, cvs.width, cvs.height);
+            background.setTransform(1,0,0,1,0,0);
+            background.clearRect(0, 0, cvs.width, cvs.height);
+        }
+
+        function translateCtx(cam) {
+            ctx.translate(-cam.x, -cam.y);
+            background.translate(-cam.x, -cam.y);
         }
 
         function getCursorPosition(canvas, event) {
@@ -84,17 +92,23 @@
             }
         });
 
-        socket.on('generateMap', function(gameMap) {
-            drawMap(background, gameMap);
-        });
-
         socket.on('explosion', function(x, y) {
             var animation = makeExplosion(x, y, explosionSheet);
             animations.push(animation);
         });
 
-        socket.on('update', function (players) {
+        var camera = {
+            x: 0,
+            y: 0,
+        };
+
+        socket.on('update', function(players, gameMap) {
             clearCtx();
+            if (players.hasOwnProperty(socket.id)) {
+                camera = players[socket.id].camera;
+            }
+            translateCtx(camera);
+            drawMap(background, gameMap);
             for (let id in players) {
                 var color, bColor;
                 var player = players[id];
@@ -115,6 +129,8 @@
                 }
                 explosion(background, animations, explosionSheet);
             }
+            ctx.save();
+            ctx.restore();
         });
 
         socket.on('playSound', playSound);
