@@ -3,9 +3,11 @@
     <head>
         <title>CORONAVIRUS GAMES</title>
         <link rel="stylesheet" type="text/css" href="static/index.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="../../socket.io/socket.io.js"></script>
         <script src="js/draw.js"></script>
         <script src="js/audio.js"></script>
+        <script src="js/animation.js"></script>
     </head>
     <body>
         <div id="wrapper">
@@ -18,9 +20,8 @@
     </body>
     <script>
         var img = new Image();
-        img.src = 'static/bush.png';
+        img.src = 'static/img/bush.png';
         var background = document.getElementById('background').getContext('2d');
-        background.fillStyle = '#B0E0E6'; // blue
     </script>
     <script>
         var socket = io.connect('http://localhost:8899');
@@ -29,6 +30,7 @@
         var ctx = cvs.getContext('2d');
 
         var alive = true;
+        var animations = [];
 
         function clearCtx() {
             ctx.clearRect(0, 0, cvs.width, cvs.height);
@@ -78,12 +80,17 @@
         cvs.addEventListener('click', function(e) {
             if (alive) {
                 socket.emit('shoot', getCursorPosition(cvs, e));
-                playShot();
+                loadSound(shotSound);
             }
         });
 
         socket.on('generateMap', function(gameMap) {
             drawMap(background, gameMap);
+        });
+
+        socket.on('explosion', function(x, y) {
+            var animation = makeExplosion(x, y, explosionSheet);
+            animations.push(animation);
         });
 
         socket.on('update', function (players) {
@@ -106,6 +113,7 @@
                 for (let bID in player.bullets) {
                     drawObj(ctx, player.bullets[bID], bColor);
                 }
+                explosion(background, animations, explosionSheet);
             }
         });
 

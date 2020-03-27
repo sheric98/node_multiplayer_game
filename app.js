@@ -50,7 +50,7 @@ io.sockets.on('connection', function(socket) {
     socket.on('shoot', function(dst) {
         if (players.hasOwnProperty(socket.id)) {
             var player = players[socket.id];
-            var bullet = bulletJS.makeBullet(player, dst, bulletCounter);
+            var bullet = bulletJS.makeBullet(player, dst, bulletCounter, io);
             bulletCounter++;
             player.bullets[bullet.id] = bullet;
         }
@@ -62,7 +62,7 @@ setInterval(sendUpdate, 1000 / 60);
 function sendUpdate() {
     playerJS.updatePlayers(sockets, areas, players);
     areaJS.updateAreas(areas, players);
-    playerJS.checkPlayers(areas, players);
+    playerJS.checkPlayers(sockets, areas, players);
     areaJS.checkAreas(areas, players);
     mapJS.resetWallChecks(walls);
     io.emit('update', players);
