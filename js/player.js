@@ -220,7 +220,6 @@ function updatePlayers(sockets, areas, players) {
         }
         if (player.hp <= 0) {
             toRemove.push(id);
-            sockets[id].emit('playSound', constants.DEATHSOUND);
             sockets[id].emit('dead');
         }
         else {

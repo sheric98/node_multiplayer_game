@@ -121,6 +121,7 @@
 
         socket.on('dead', function() {
             alive = false;
+            loadSound(deathSound);
             alert('You are dead.');
         });
 
