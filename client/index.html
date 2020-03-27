@@ -92,10 +92,6 @@
             }
         });
 
-        socket.on('generateMap', function(gameMap) {
-            drawMap(background, gameMap);
-        });
-
         socket.on('explosion', function(x, y) {
             var animation = makeExplosion(x, y, explosionSheet);
             animations.push(animation);

@@ -26,7 +26,6 @@ var areas = areaJS.initAreas(walls);
 io.sockets.on('connection', function(socket) {
     sockets[socket.id] = socket;
     players[socket.id] = playerJS.makePlayer(socket.id, availPos);
-    io.emit('generateMap', gameMap);
 
     socket.on('disconnect', function() {
         delete sockets[socket.id];
