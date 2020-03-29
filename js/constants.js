@@ -13,5 +13,7 @@ module.exports = {
     CAM_WIDTH: 500,
     CAM_HEIGHT: 500,
     TILE_X: 50,
-    TILE_Y: 50
+    TILE_Y: 50,
+    FPS: 60,
+    ENEMY_SPAWN: 10
 }

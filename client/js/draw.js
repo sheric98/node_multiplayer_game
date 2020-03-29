@@ -19,7 +19,7 @@ function drawHP(ctx, player) {
     else {
         y = player.y - player.radius - HP_HEIGHT - HP_PAD;
     }
-    var greenLen = 2 * player.radius * player.hp / 100;
+    var greenLen = 2 * player.radius * player.hp / player.maxHP;
     var redLen = 2 * player.radius - greenLen;
     if (greenLen !== 0) {
         ctx.fillStyle = 'green';

@@ -5,11 +5,17 @@ module.exports = {
     initAreas: function(walls) {
         return initAreas(walls);
     },
-    updateAreas: function(areas, players) {
-        updateAreas(areas, players);
+    updateAreas: function(areas, players, enemies) {
+        updateAreas(areas, players, enemies);
     },
-    checkAreas: function(areas, players) {
-        checkAreas(areas, players);
+    checkAreas: function(areas, players, enemies) {
+        checkAreas(areas, players, enemies);
+    },
+    updatePlayerArea: function(areas, player) {
+        updatePlayerArea(areas, player);
+    },
+    updateEnemyArea: function(areas, enemy) {
+        updateEnemyArea(areas, enemy);
     }
 }
 
@@ -46,34 +52,83 @@ function setDiff(a, b) {
     return new Set([...a].filter(x => !b.has(x)));
 }
 
+function addPlayer(area, id) {
+    area.players.add(id);
+}
+
+function removePlayer(area, id) {
+    area.players.delete(id);
+}
+
+function addBullet(area, pID, bID) {
+    if (!area.playerBullets.has(pID)) {
+        area.playerBullets.set(pID, new Set());
+    }
+    area.playerBullets.get(pID).add(bID);
+}
+
+function removeBullet(area, pID, bID) {
+    if (area.playerBullets.has(pID)) {
+        var pbSet = area.playerBullets.get(pID);
+        pbSet.delete(bID);
+        if (pbSet.size == 0) {
+            area.playerBullets.delete(pID);
+        }
+    }
+}
+
+function addEnemy(area, id) {
+    area.enemies.add(id);
+}
+
+function removeEnemy(area, id) {
+    area.enemies.delete(id);
+}
+
+function addEnemyVision(area, id) {
+    area.enemyVisions.add(id);
+}
+
+function removeEnemyVision(area, id) {
+    area.enemyVisions.delete(id);
+}
+
+var addFunctions = [addPlayer, addBullet, addEnemy, addEnemyVision];
+var removeFunctions = [removePlayer, removeBullet, removeEnemy, removeEnemyVision];
+
 function Area() {
     this.players = new Set();
     this.playerBullets = new Map();
     this.walls = [];
+    this.enemies = new Set();
+    this.enemyVisions = new Set();
     this.addPlayer = function(id) {
-        this.players.add(id);
-    }
+        addPlayer(this, id);
+    };
     this.removePlayer = function(id) {
-        this.players.delete(id);
-    }
+        removePlayer(this, id);
+    };
     this.addBullet = function(pID, bID) {
-        if (!this.playerBullets.has(pID)) {
-            this.playerBullets.set(pID, new Set());
-        }
-        this.playerBullets.get(pID).add(bID);
-    }
+        addBullet(this, pID, bID);
+    };
     this.removeBullet = function(pID, bID) {
-        if (this.playerBullets.has(pID)) {
-            var pbSet = this.playerBullets.get(pID);
-            pbSet.delete(bID);
-            if (pbSet.size == 0) {
-                this.playerBullets.delete(pID);
-            }
-        }
-    }
+        removeBullet(this, pID, bID);
+    };
     this.addWall = function(wall) {
         this.walls.push(wall);
-    }
+    };
+    this.addEnemy = function(id) {
+        addEnemy(this, id);
+    };
+    this.removeEnemy = function(id) {
+        removeEnemy(this, id);
+    };
+    this.addEnemyVision = function(id) {
+        addEnemyVision(this, id);
+    };
+    this.removeEnemyVision = function(id) {
+        removeEnemyVision(this, id);
+    };
 }
 
 function initAreas(walls) {
@@ -136,60 +191,74 @@ function boxToAreas(box) {
     return rangesToAreas(x_range, y_range);
 }
 
-function circlesToAreas(obj) {
-    var x_min = obj.x - obj.radius;
-    var x_max = obj.x + obj.radius;
-    var y_min = obj.y - obj.radius;
-    var y_max = obj.y + obj.radius;
+function circlesToAreas(obj, radius = null) {
+    var rad = radius == null ? obj.radius : radius;
+    var x_min = obj.x - rad;
+    var x_max = obj.x + rad;
+    var y_min = obj.y - rad;
+    var y_max = obj.y + rad;
 
     var x_range = minMaxToIndices(x_min, x_max, true);
     var y_range = minMaxToIndices(y_min, y_max, false);
     return rangesToAreas(x_range, y_range);
 }
 
-function updateAdditionObj(areas, obj, players, isPlayer, pID, bID = null) {
-    var occupiedAreas = circlesToAreas(obj);
-    var noLongerIn = setDiff(obj.areas, occupiedAreas);
-    var cameInto = setDiff(occupiedAreas, obj.areas);
-
-    var player = players[pID];
+function updateAdditionObj(areas, obj, pID, type, bID = null, radius = null,
+    isVision = false) {
+    var objAreas = isVision ? obj.visionAreas : obj.areas;
+    var occupiedAreas = circlesToAreas(obj, radius);
+    var noLongerIn = setDiff(objAreas, occupiedAreas);
+    var cameInto = setDiff(occupiedAreas, objAreas);
 
     for (let i of noLongerIn) {
-        if (isPlayer) {
-            areas[i].removePlayer(pID);
-            player.areas.delete(i);
+        if (bID == null) {
+            removeFunctions[type](areas[i], pID);
         }
         else {
-            areas[i].removeBullet(pID, bID);
-            player.bullets[bID].areas.delete(i);
+            removeFunctions[type](areas[i], pID, bID);
         }
+        objAreas.delete(i);
     }
 
     for (let i of cameInto) {
-        if (isPlayer) {
-            areas[i].addPlayer(pID);
-            player.areas.add(i);
+        if (bID == null) {
+            addFunctions[type](areas[i], pID);
         }
         else {
-            areas[i].addBullet(pID, bID);
-            player.bullets[bID].areas.add(i);
+            addFunctions[type](areas[i], pID, bID);
         }
+        objAreas.add(i);
     }
 }
 
-function updateAreas(areas, players) {
+function updateEnemyArea(areas, enemy) {
+    updateAdditionObj(areas, enemy, enemy.id, 2);
+    updateAdditionObj(areas, enemy, enemy.id, 3, null, enemy.vision, true);
+}
+
+function updatePlayerArea(areas, player) {
+    updateAdditionObj(areas, player, player.id, 0);
+}
+
+function updateAreas(areas, players, enemies) {
     for (let pID in players) {
         var player = players[pID];
-        updateAdditionObj(areas, player, players, true, pID);
+        updatePlayerArea(areas, player);
         for (let bID in player.bullets) {
             var bullet = player.bullets[bID];
-            updateAdditionObj(areas, bullet, players, false, pID, bID);
+            updateAdditionObj(areas, bullet, pID, 1, bID);
         }
+    }
+    for (let eID in enemies) {
+        var enemy = enemies[eID];
+        updateEnemyArea(areas, enemy);
     }
 }
 
-function checkAreas(areas, players) {
+function checkAreas(areas, players, enemies) {
     for (let area of areas) {
-        collJS.checkHits(areas, players, area.players, area.playerBullets);
+        collJS.checkBulletHits(areas, players, players, area.players, area.playerBullets);
+        collJS.checkBulletHits(areas, players, enemies, area.enemies, area.playerBullets);
+        collJS.checkMeleeHits(players, enemies, area.players, area.enemies);
     }
 }
