@@ -26,7 +26,6 @@ var areas = areaJS.initAreas(walls);
 io.sockets.on('connection', function(socket) {
     sockets[socket.id] = socket;
     players[socket.id] = playerJS.makePlayer(socket.id, availPos);
-    io.emit('generateMap', gameMap);
 
     socket.on('disconnect', function() {
         delete sockets[socket.id];
@@ -50,6 +49,8 @@ io.sockets.on('connection', function(socket) {
     socket.on('shoot', function(dst) {
         if (players.hasOwnProperty(socket.id)) {
             var player = players[socket.id];
+            dst.x += player.camera.x;
+            dst.y += player.camera.y;
             var bullet = bulletJS.makeBullet(player, dst, bulletCounter, io);
             bulletCounter++;
             player.bullets[bullet.id] = bullet;
@@ -65,7 +66,7 @@ function sendUpdate() {
     playerJS.checkPlayers(sockets, areas, players);
     areaJS.checkAreas(areas, players);
     mapJS.resetWallChecks(walls);
-    io.emit('update', players);
+    io.emit('update', players, gameMap);
 }
 
 const server = http.listen(8899, function() {
