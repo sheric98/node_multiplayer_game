@@ -73,6 +73,7 @@ function explosion(ctx, anims, sheet) {
             anims.splice(i, 1);
             ctx.fillStyle = '#FFFFFF'; // white
             ctx.fillRect(anim.x, anim.y, SPRITE_SIZE, SPRITE_SIZE);
+            delete anim;
         } else {
             ctx.drawImage(sheet.image, anim.frame * SPRITE_SIZE, 5, SPRITE_SIZE,
                 SPRITE_SIZE, anim.x, anim.y, SPRITE_SIZE, SPRITE_SIZE);
