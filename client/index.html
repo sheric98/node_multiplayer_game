@@ -102,7 +102,7 @@
             y: 0,
         };
 
-        socket.on('update', function(players, gameMap) {
+        socket.on('update', function(players, enemies, gameMap) {
             clearCtx();
             if (players.hasOwnProperty(socket.id)) {
                 camera = players[socket.id].camera;
@@ -129,8 +129,11 @@
                 }
                 explosion(background, animations, explosionSheet);
             }
-            ctx.save();
-            ctx.restore();
+            for (let eID in enemies) {
+                var enemy = enemies[eID];
+                drawObj(ctx, enemy, 'purple');
+                drawHP(ctx, enemy);
+            }
         });
 
         socket.on('playSound', playSound);
