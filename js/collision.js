@@ -1,24 +1,28 @@
+const util = require('./util');
+
 module.exports = {
-    checkHits: function(areas, players, toCheck, pbMap) {
-        checkHits(areas, players, toCheck, pbMap);
+    checkBulletHits: function(areas, players, fullList, toCheck, pbMap) {
+        checkBulletHits(areas, players, fullList, toCheck, pbMap);
     },
     playerWall: function(player, wall, Xcoord) {
         return playerWallCollision(player, wall, Xcoord);
     },
     circleBoxCollision: function(circle, box) {
         return circleBoxCollision(circle, box);
+    },
+    circleCollide: function(a, b, aRadius, bRadius) {
+        return circleCollide(a, b, aRadius, bRadius);
+    },
+    checkMeleeHits: function(type1, type2, gettingHit, hitting) {
+        checkMeleeHits(type1, type2, gettingHit, hitting);
     }
 }
 
-function dist(a, b) {
-    var distX = a.x - b.x;
-    var distY = a.y - b.y;
-    return Math.sqrt((distX * distX) + (distY * distY));
-}
-
-function circleCollide(a, b) {
-    var thresh = a.radius + b.radius;
-    var distance = dist(a, b);
+function circleCollide(a, b, aRadius = null, bRadius = null) {
+    var aRad = aRadius == null ? a.radius : aRadius;
+    var bRad = bRadius == null ? b.radius : bRadius;
+    var thresh = aRad + bRad;
+    var distance = util.dist(a, b);
     return distance <= thresh;
 }
 
@@ -60,7 +64,7 @@ function closestPoint(circle, box) {
 
 function circleBoxCollision(circle, box) {
     var closest = closestPoint(circle, box);
-    return (dist(circle, closest) <= circle.radius);
+    return (util.dist(circle, closest) <= circle.radius);
 }
 
 function playerWallCollision(player, wall, Xcoord) {
@@ -74,7 +78,7 @@ function playerWallCollision(player, wall, Xcoord) {
     return [Math.abs(wall - coord) <= player.radius, wall < coord];
 }
 
-function checkHits(areas, players, toCheck, playerBulletsMap) {
+function checkBulletHits(areas, players, fullList, toCheck, playerBulletsMap) {
     var toRemove = new Object();
 
     for (let id of playerBulletsMap.keys()) {
@@ -84,20 +88,23 @@ function checkHits(areas, players, toCheck, playerBulletsMap) {
     for (let id of toCheck) {
         for (let id2 of playerBulletsMap.keys()) {
             if (id !== id2) {
-                var player = players[id];
-                var player2 = players[id2];
+                var obj = fullList[id];
+                var playerBullet = players[id2];
                 for (let bID of playerBulletsMap.get(id2)) {
-                    var bullet = player2.bullets[bID];
-                    if (!player.checkedBullets.has(bID)) {
-                        if (circleCollide(player, bullet)) {
-                            player.bulletHitAudio = true;
-                            player.hp -= bullet.damage;
-                            if (player.hp < 0) {
-                                player.hp = 0;
+                    var bullet = playerBullet.bullets[bID];
+                    if (!obj.checked.has(bID)) {
+                        if (circleCollide(obj, bullet)) {
+                            obj.bulletHitAudio = true;
+                            obj.hp -= bullet.damage;
+                            if (obj.hp < 0) {
+                                obj.hp = 0;
+                            }
+                            if (obj.hp == 0) {
+                                playerBullet.exp += obj.expVal;
                             }
                             toRemove[id2].push(bID);
                         }
-                        player.checkedBullets.add(bID);
+                        obj.checked.add(bID);
                     }
                 }
             }
@@ -105,7 +112,32 @@ function checkHits(areas, players, toCheck, playerBulletsMap) {
     }
     for (let id in toRemove) {
         for (let bID of toRemove[id]) {
-            players[id].bullets[bID].remove(areas, players);
+            if (players[id].bullets.hasOwnProperty(bID)) {
+                players[id].bullets[bID].remove(areas, players);
+            }
+        }
+    }
+}
+
+function checkMeleeHits(type1, type2, gettingHit, hitting) {
+    for (let id1 of gettingHit) {
+        var obj1 = type1[id1];
+        if (obj1.enemyImmune) {
+            continue;
+        }
+        for (let id2 of hitting) {
+            var obj2 = type2[id2];
+            if (!(obj1.checked.has(id2) || obj2.checked.has(id1))) {
+                obj1.checked.add(id2);
+                obj2.checked.add(id1);
+                if (circleCollide(obj1, obj2)) {
+                    obj1.hp -= obj2.damage;
+                    obj1.enemyImmune = true;
+                    if (obj1.hp < 0) {
+                        obj1.hp = 0;
+                    }
+                }
+            }
         }
     }
 }

@@ -47,11 +47,9 @@ function Wall(x, y, width, height, collapsible) {
     this.width = width;
     this.height = height;
     this.collapsible = collapsible;
-    this.checkedPlayers = new Set();
-    this.checkedBullets = new Set();
+    this.checked = new Set();
     this.reset = function() {
-        this.checkedPlayers.clear();
-        this.checkedBullets.clear();
+        this.checked.clear();
     }
 }
 
