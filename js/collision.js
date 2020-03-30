@@ -112,7 +112,9 @@ function checkBulletHits(areas, players, fullList, toCheck, playerBulletsMap) {
     }
     for (let id in toRemove) {
         for (let bID of toRemove[id]) {
-            players[id].bullets[bID].remove(areas, players);
+            if (players[id].bullets.hasOwnProperty(bID)) {
+                players[id].bullets[bID].remove(areas, players);
+            }
         }
     }
 }
