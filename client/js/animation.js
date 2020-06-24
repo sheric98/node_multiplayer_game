@@ -1,4 +1,5 @@
-const SPRITE_SIZE = 50;
+const SPRITE_SIZE = 65;
+const TILE_SIZE = 50;
 
 function Animation(x, y, frameSet, delay, spriteSheetLen) {
     this.x = x;
@@ -72,11 +73,11 @@ function explosion(ctx, anims, sheet) {
         if (anim.stop) {
             anims.splice(i, 1);
             ctx.fillStyle = '#FFFFFF'; // white
-            ctx.fillRect(anim.x, anim.y, SPRITE_SIZE, SPRITE_SIZE);
+            ctx.fillRect(anim.x, anim.y, TILE_SIZE, TILE_SIZE);
             delete anim;
         } else {
-            ctx.drawImage(sheet.image, anim.frame * SPRITE_SIZE, 5, SPRITE_SIZE,
-                SPRITE_SIZE, anim.x, anim.y, SPRITE_SIZE, SPRITE_SIZE);
+            ctx.drawImage(sheet.image, anim.frame * SPRITE_SIZE - 5, 0, SPRITE_SIZE,
+                SPRITE_SIZE, anim.x, anim.y, TILE_SIZE, TILE_SIZE);
             anim.update();
         }
     });
